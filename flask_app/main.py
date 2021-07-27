@@ -1,4 +1,4 @@
-from api_project.prectice_api import app2
+from api_project.meal import app2
 from api_project.region_weather import app_weather
 
 
