@@ -71,9 +71,9 @@ def meal():
     Url example: http://13.231.176.185:80/meal
     Methods: POST
     Header = {Content-Type:application/json}
-    Body raw = {"city_list":"台北市大安區","keyword":"麥當勞","radius_meter":"1000"}
+    Body raw = {"specific_addr":"台北市大安區","keyword":"麥當勞","radius_meter":"1000"}
     '''
-    specific_addr = request.get_json()['city_list']
+    specific_addr = request.get_json()['specific_addr']
     keyword = request.get_json()['keyword']
     radius_meter = request.get_json()['radius_meter']
 
