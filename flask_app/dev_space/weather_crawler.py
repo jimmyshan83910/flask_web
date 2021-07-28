@@ -26,7 +26,6 @@ class WeatherUpdate():
     def region_prediction_weather(self, region="640"):
         '''
         Use crawler to grab City's region prediction weather.
-        url: http://13.231.176.185:5000/r_weather?region=640
         return {
             'Time':['03 07/14', '06 07/14', ...],
             'C':{'T':[29, 28, ...], 'AT':[33, 33, ...]},
@@ -89,13 +88,12 @@ class WeatherUpdate():
                 continue
         
         print(result_dict)
-        # return result_dict[region]
 
     def region_current_weather(self):
         '''
-        Use crawler to grab City's region current weather
+        Use crawler to grab City's region current weather.
+        Doesn't finish yet, this founction will connect API.
         '''
-        # Doesn't finish yet, this founction will connect API
         weather = rq.get(
                     "https://www.cwb.gov.tw/Data/js/GT/TableData_GT_T_64.js?T=2021070518-2&_=1625480972142")
         current_weather = eval(re.search(r'(var GT) = ({.*)', weather.text, re.S).group(2).rstrip(';'))
@@ -109,7 +107,6 @@ class WeatherUpdate():
             Use crawler to grab City's current and prediction weather.
             url example: http://13.231.176.185:80/c_weather?city=64
         '''
-        # city = request.args.get('city')
         weather = rq.get(
             "https://www.cwb.gov.tw/Data/js/TableData_36hr_County_C.js?T=202106{}{}".format(
                 self.date.day, self.date.hour))
