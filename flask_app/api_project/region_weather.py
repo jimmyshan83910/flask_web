@@ -1,19 +1,20 @@
-from flask import Flask, Blueprint, request, jsonify
+from flask import Flask, request, jsonify
 import requests as rq
 from bs4 import BeautifulSoup
 import ast
 import re
 from datetime import datetime
+from api_project import app
 
 
 current_time = datetime.now()
-app_weather = Blueprint('app_weather', __name__)
 
-@app_weather.route('/r_weather', methods = ['GET'])
+@app.route('/weather/region', methods = ['GET'])
 def r_weather():
     '''
     Use crawler to grab City's region prediction weather.
-    url example: http://13.231.176.185:80/r_weather?city=64&region=6400100
+    url example: http://13.231.176.185:80/weather/region?city=64&region=6400100
+    methods: GET
     return {
         'Time':['03 07/14', '06 07/14', ...],
         'C':{'T':[29, 28, ...], 'AT':[33, 33, ...]},
@@ -23,7 +24,6 @@ def r_weather():
         'Comfort':['舒適', '舒適', ...]
         }
     '''
-    
     # return data format
     result_dict = {
         'Time':[],
@@ -84,11 +84,12 @@ def r_weather():
 
     return result_dict
 
-@app_weather.route('/c_weather', methods = ['GET'])
+@app.route('/weather/city', methods = ['GET'])
 def c_weather():
     '''
     Use crawler to grab City's current and prediction weather.
-    url example: http://13.231.176.185:80/c_weather?city=64
+    url example: http://13.231.176.185:80/weather/city?city=64
+    methods: GET
     '''
     city = request.args.get('city')
     weather = rq.get(
