@@ -6,7 +6,6 @@ import time
 import re
 
 
-
 try:
     dotenv_path = join(dirname(os.path.abspath(__file__)), './G_API_key.env')
     load_dotenv(dotenv_path, override=True)
