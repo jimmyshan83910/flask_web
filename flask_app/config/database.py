@@ -14,6 +14,7 @@ class WeatherDB():
     def get_db(self):
         return self.conn.cursor(cursor_factory = RealDictCursor)
     
+    
     # def close_db_connect(self):
     #     # # According to blow syntax, close cursor fail. How do i close it ??? or it's necessary????
     #     # self.conn.cursor(cursor_factory = RealDictCursor).close()
