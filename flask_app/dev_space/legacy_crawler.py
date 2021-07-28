@@ -54,7 +54,6 @@ if __name__ == '__main__':
         print(current_ts)
         if (current_ts.hour == 15 and current_ts.minute == 52):
             # Crawler weather data and insert into DB
-            print("IN!!!")
             WeatherUpdate().grab_weather()
             print("Processing data done, Wait 23 hours for next process")
             time.sleep(82800)
