@@ -69,14 +69,17 @@ def r_weather():
     region_list = [item for item in prediction_weather]
 
     for value in prediction_weather.values():
-        # 等API完成後會傳入region這個引數
         if region in region_list:
             temperature = value['C']['T']
             A_temperature = value['C']['AT']
             wx = [item[1] for item in value['Wx']['C']]
+            # 天氣預報時間表, 放進result_dict
             result_dict['Time'] = prediction_time_list
+            # 攝氏溫度, 放進result_dict
             result_dict['C']['T'] = temperature
+            # 攝氏體感溫度, 放進result_dict
             result_dict['C']['AT'] = A_temperature
+            # 天氣情況, 放進result_dict
             result_dict['Wx'] = wx
             break
         else:

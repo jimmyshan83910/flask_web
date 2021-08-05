@@ -7,6 +7,7 @@ from os.path import join, dirname
 import googlemaps
 import time
 import re
+import json
 
 
 try:
@@ -73,9 +74,10 @@ def meal():
     Header = {Content-Type:application/json}
     Body raw = {"specific_addr":"台北市大安區","keyword":"麥當勞","radius_meter":"1000"}
     '''
-    specific_addr = request.get_json()['specific_addr']
-    keyword = request.get_json()['keyword']
-    radius_meter = request.get_json()['radius_meter']
+    data = json.loads(request.get_data())
+    specific_addr = data['specific_addr']
+    keyword = data['keyword']
+    radius_meter = data['radius_meter']
 
     place_results = city_keyword_mapping(specific_addr, keyword, radius_meter)
 
