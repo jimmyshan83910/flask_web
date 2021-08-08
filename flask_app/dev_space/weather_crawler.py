@@ -22,10 +22,14 @@ class WeatherUpdate():
         self.conn = database.WeatherDB()
         self.conn.get_db()
         self.date = datetime.now()
+        self.city_list = {}
+        self.region_list = {}
 
-    def region_prediction_weather(self, region="640"):
+    def region_prediction_weather(self, city="64", region="6400100"):
         '''
         Use crawler to grab City's region prediction weather.
+        url example: http://13.231.176.185:80/weather/region?city=64&region=6400100
+        methods: GET
         return {
             'Time':['03 07/14', '06 07/14', ...],
             'C':{'T':[29, 28, ...], 'AT':[33, 33, ...]},
@@ -35,6 +39,7 @@ class WeatherUpdate():
             'Comfort':['舒適', '舒適', ...]
             }
         '''
+        # return data format
         result_dict = {
             'Time':[],
             'C':{'T':[], 'AT':[]},
@@ -43,50 +48,59 @@ class WeatherUpdate():
             'Humidity':[],
             'Comfort':[]
             }
-        
+
+        # Use GET methods to get variable
+        # city = request.args.get('city')
+        # region = request.args.get('region')
+
         rainh_list = list()
         Humidity_list = list()
         Comfort_list = list()
 
         weather = rq.get(
-                    "https://www.cwb.gov.tw/Data/js/3hr/ChartData_3hr_T_{}.js?T=2021070522-1&_=1625494733283".format('64'))
-        weather_new = rq.get(
-                    "https://www.cwb.gov.tw/V8/C/W/Town/MOD/3hr/6300100_3hr_PC.html?T=2021070522-5")
+                    "https://www.cwb.gov.tw/Data/js/3hr/ChartData_3hr_T_{}.js?T=2021070522-1&_=1625494733283".format(city))
+        other_weather_data = rq.get(
+                    "https://www.cwb.gov.tw/V8/C/W/Town/MOD/3hr/{}_3hr_PC.html?T=2021070522-5".format(region))
         
-        data = BeautifulSoup(weather_new.text, 'html.parser')
+        crawler_data = BeautifulSoup(other_weather_data.text, 'html.parser').find_all("tr")
         title_list = ['降雨機率','相對濕度','舒適度']
-        crawler_data = data.find_all("tr")
 
         for item in crawler_data:
             title = list(item.children)
-            # 降雨機率
+            # 降雨機率, 放進result_dict
             [rainh_list.append(title[_item].text) for _item in range(3, len(title), 2) if title[1].text == title_list[0]]
             result_dict['RH'] = rainh_list
-            # 相對濕度
+            # 相對濕度, 放進result_dict
             [Humidity_list.append(title[_item].text) for _item in range(3, len(title), 2) if title[1].text == title_list[1]]
             result_dict['Humidity'] = Humidity_list
-            # 舒適度
+            # 舒適度, 放進result_dict
             [Comfort_list.append(title[_item].text) for _item in range(3, len(title), 2) if title[1].text == title_list[2]]
             result_dict['Comfort'] = Comfort_list
 
-        prediction_time_list = ast.literal_eval(re.search(r'(var Time_3hr) = (.*);', weather.text).group(2))
-        prediction_weather = eval(re.search(r'(var TempArray_3hr) = ({.*)', weather.text, re.S).group(2).rstrip(';'))
+        prediction_time_list = ast.literal_eval(
+            re.search(r'(var Time_3hr) = (.*);', weather.text).group(2))
+        prediction_weather = eval(
+            re.search(r'(var TempArray_3hr) = ({.*);', weather.text, re.S).group(2))
         region_list = [item for item in prediction_weather]
 
-        for key, value in prediction_weather.items():
-            # 等API完成後會傳入"6300100"這個引數
-            if key == "6300100":
+        for value in prediction_weather.values():
+            if region in region_list:
                 temperature = value['C']['T']
                 A_temperature = value['C']['AT']
                 wx = [item[1] for item in value['Wx']['C']]
+                # 天氣預報時間表, 放進result_dict
                 result_dict['Time'] = prediction_time_list
+                # 攝氏溫度, 放進result_dict
                 result_dict['C']['T'] = temperature
+                # 攝氏體感溫度, 放進result_dict
                 result_dict['C']['AT'] = A_temperature
+                # 天氣情況, 放進result_dict
                 result_dict['Wx'] = wx
                 break
             else:
-                continue
-        
+                return "Grab data wrong, please check your url or crawler url !!!"
+
+        # return result_dict
         print(result_dict)
 
     def region_current_weather(self):
@@ -96,7 +110,7 @@ class WeatherUpdate():
         '''
         weather = rq.get(
                     "https://www.cwb.gov.tw/Data/js/GT/TableData_GT_T_64.js?T=2021070518-2&_=1625480972142")
-        current_weather = eval(re.search(r'(var GT) = ({.*)', weather.text, re.S).group(2).rstrip(';'))
+        current_weather = eval(re.search(r'(var GT) = ({.*);', weather.text, re.S).group(2))
 
         for key, value in current_weather.items():
             print(key)
@@ -111,7 +125,7 @@ class WeatherUpdate():
             "https://www.cwb.gov.tw/Data/js/TableData_36hr_County_C.js?T=202106{}{}".format(
                 self.date.day, self.date.hour))
 
-        city_weather = eval(re.search(r'({.*)', weather.text, re.S).group(0).rstrip(';'))
+        city_weather = eval(re.search(r'({.*);', weather.text, re.S).group(0))
         
         # return city_weather[city]
         print(city_weather[city])
