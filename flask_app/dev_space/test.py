@@ -1,6 +1,10 @@
-import re
+import json
 
-string = ["麥當勞-復興二店","BURGER KING漢堡王 敦南店"]
-for item in string:
-    if re.search("漢堡王", item):
-        print(item)
+
+with open('../api_project/data/city_list.json') as file:
+    result_1 = json.load(file)
+
+with open('../api_project/data/region_list.json') as file:
+    result_2 = json.load(file)
+
+print(result_2)
