@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Jimmy add stuff
+flask_app/api_project/G_API_key.env
